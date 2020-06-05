@@ -24,9 +24,15 @@ public class UpdateServiceByTicketingSystem
     private final UsageCounterNoOptimisticRepository usageCounterNoOptimisticRepository;
 
     @Transactional
-    public synchronized void update(Long masterId, Integer maxCounter) throws RuntimeException
-    {
-        incrementUsageCounter(masterId, maxCounter);
+    public synchronized void update(Long masterId, Integer sleep) throws RuntimeException, InterruptedException {
+        UsageDetail usageDetail = incrementUsageCounter(masterId, sleep);
+        // we add scenario for cancel very number 7 customer
+        if (usageDetail != null){
+            if (usageDetail.getSequenceNumber()%10==7){
+                cancelTransactionUsage(masterId,usageDetail);
+            }
+        }
+
     }
 
     private UsageDetail saveToDetail(Long masterId,int sequence)
@@ -35,6 +41,7 @@ public class UpdateServiceByTicketingSystem
         usageDetail.setMasterId(masterId);
         usageDetail.setTranscationId(UUID.randomUUID().toString());
         usageDetail.setSequenceNumber(sequence);
+        usageDetail.setCancel(false);
         return usageDetailRepository.saveAndFlush(usageDetail);
     }
 
@@ -47,28 +54,22 @@ public class UpdateServiceByTicketingSystem
         return usageFailDetailRepository.saveAndFlush(usageFailDetail);
     }
 
-    private void incrementUsageCounter(Long masterId, Integer maxCounter) throws RuntimeException
-    {
+    private UsageDetail incrementUsageCounter(Long masterId, Integer sleep) throws RuntimeException, InterruptedException {
         UsageCounterNoVersion usageCounterNoVersion = usageCounterNoOptimisticRepository.updateUsage(masterId, 1);
-        if (usageCounterNoVersion.getUsage() > maxCounter) {
-            //rollback
+
+        Thread.sleep(sleep);
+        if (usageCounterNoVersion.getUsage() > usageCounterNoVersion.getMaxCounter()) {
+            //rollback because usage is more than allowed usage
             saveFailToDetail(masterId,usageCounterNoVersion.getUsage());
             usageCounterNoOptimisticRepository.updateUsage(masterId, -1);
+            return null;
         }else{
-            saveToDetail(masterId,usageCounterNoVersion.getUsage());
+            return saveToDetail(masterId,usageCounterNoVersion.getUsage());
         }
     }
-
-    private UsageCounterNoVersion composeUsageCounter(Long masterId, Integer maxCounter)
-    {
-        return usageCounterNoOptimisticRepository
-                .findById(masterId)
-                .orElseGet(() -> {
-                    UsageCounterNoVersion usageCounterNoVersion = new UsageCounterNoVersion();
-                    usageCounterNoVersion.setMasterId(masterId);
-                    usageCounterNoVersion.setMaxCounter(maxCounter);
-                    usageCounterNoVersion.setUsage(0);
-                    return usageCounterNoVersion;
-                });
+    private void cancelTransactionUsage(Long masterId,UsageDetail usageDetail){
+        usageCounterNoOptimisticRepository.updateMaxUsage(masterId, 1);
+        usageDetail.setCancel(true);
+        usageDetailRepository.saveAndFlush(usageDetail);
     }
 }

@@ -16,6 +16,8 @@ public class UsageCounter {
   private Integer maxCounter;
   @Column(name = "\"usage\"", nullable = true)
   private Integer usage;
+  @Column(name = "\"max_usage\"", nullable = true)
+  private Integer maxUsage;
   @Column(name = "\"version\"", nullable = true)
   private Integer version;
 }

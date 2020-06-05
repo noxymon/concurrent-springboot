@@ -20,4 +20,7 @@ public interface UsageCounterNoOptimisticRepository extends JpaRepository<UsageC
     @Query(value = "update usage_counter set usage=usage+:usage where master_id=:masterId returning * ",nativeQuery = true)
     UsageCounterNoVersion updateUsage(@Param("masterId") long masterId, @Param("usage") long usage);
 
+    @Query(value = "update usage_counter set max_counter=max_counter+:usage where master_id=:masterId returning * ",nativeQuery = true)
+    UsageCounterNoVersion updateMaxUsage(@Param("masterId") long masterId, @Param("usage") long usage);
+
 }

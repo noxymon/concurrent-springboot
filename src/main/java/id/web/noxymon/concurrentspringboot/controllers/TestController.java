@@ -25,10 +25,15 @@ public class TestController
         return new ResponseEntity(HttpStatus.ACCEPTED);
     }
 
-    @GetMapping("/ticketing/{masterId}/{maxUsage}")
-    public ResponseEntity method(@PathVariable Long masterId, @PathVariable Integer maxUsage)
-    {
-        updateServiceByTicketingSystem.update(masterId, maxUsage);
+    @GetMapping("/ticketing/{masterId}")
+    public ResponseEntity method(@PathVariable Long masterId) throws InterruptedException {
+        updateServiceByTicketingSystem.update(masterId, 100);
+        return new ResponseEntity(HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping("/ticketing/{masterId}/{sleep}")
+    public ResponseEntity method(@PathVariable Long masterId, @PathVariable Integer sleep) throws InterruptedException {
+        updateServiceByTicketingSystem.update(masterId, sleep);
         return new ResponseEntity(HttpStatus.ACCEPTED);
     }
 }

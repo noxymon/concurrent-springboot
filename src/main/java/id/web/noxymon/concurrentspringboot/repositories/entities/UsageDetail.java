@@ -24,4 +24,7 @@ public class UsageDetail {
   private String transcationId;
   @Column(name = "\"sequence_number\"", nullable = true)
   private Integer sequenceNumber;
+  @Column(name = "\"is_cancel\"", nullable = true)
+  private Boolean cancel;
+
 }

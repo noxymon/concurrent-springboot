@@ -36,26 +36,9 @@ public class UpdateServiceByTicketingSystem
 
     private void incrementUsageCounter(Long masterId, Integer maxCounter) throws RuntimeException
     {
-        final UsageCounterNoVersion usageCounter = composeUsageCounter(masterId, maxCounter);
-        usageCounter.setUsage(usageCounter.getUsage() + 1);
-
-        final UsageCounterNoVersion usageCounterAfterSave = usageCounterNoOptimisticRepository.saveAndFlush(usageCounter);
-
-        if (usageCounterAfterSave.getUsage() > maxCounter) {
+        final int usageAfterIncement = usageCounterNoOptimisticRepository.incrementUsage(masterId, maxCounter);
+        if (usageAfterIncement > maxCounter) {
             throw new RuntimeException("Failed !!");
         }
-    }
-
-    private UsageCounterNoVersion composeUsageCounter(Long masterId, Integer maxCounter)
-    {
-        return usageCounterNoOptimisticRepository
-                .findById(masterId)
-                .orElseGet(() -> {
-                    UsageCounterNoVersion usageCounterNoVersion = new UsageCounterNoVersion();
-                    usageCounterNoVersion.setMasterId(masterId);
-                    usageCounterNoVersion.setMaxCounter(maxCounter);
-                    usageCounterNoVersion.setUsage(0);
-                    return usageCounterNoVersion;
-                });
     }
 }

@@ -2,6 +2,7 @@ package id.web.noxymon.concurrentspringboot.services;
 
 import id.web.noxymon.concurrentspringboot.repositories.UsageCounterNoOptimisticRepository;
 import id.web.noxymon.concurrentspringboot.repositories.UsageDetailRepository;
+import id.web.noxymon.concurrentspringboot.repositories.entities.UsageCounter;
 import id.web.noxymon.concurrentspringboot.repositories.entities.UsageCounterNoVersion;
 import id.web.noxymon.concurrentspringboot.repositories.entities.UsageDetail;
 import lombok.RequiredArgsConstructor;
@@ -36,13 +37,10 @@ public class UpdateServiceByTicketingSystem
 
     private void incrementUsageCounter(Long masterId, Integer maxCounter) throws RuntimeException
     {
-        final UsageCounterNoVersion usageCounter = composeUsageCounter(masterId, maxCounter);
-        usageCounter.setUsage(usageCounter.getUsage() + 1);
-
-        final UsageCounterNoVersion usageCounterAfterSave = usageCounterNoOptimisticRepository.saveAndFlush(usageCounter);
-
-        if (usageCounterAfterSave.getUsage() > maxCounter) {
-            throw new RuntimeException("Failed !!");
+        UsageCounterNoVersion usageCounterNoVersion = usageCounterNoOptimisticRepository.updateUsage(masterId, 1);
+        if (usageCounterNoVersion.getUsage() > maxCounter) {
+            //rollback
+            usageCounterNoOptimisticRepository.updateUsage(masterId, -1);
         }
     }
 

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "/test", produces = "application/json", consumes = "application/json")
+@RequestMapping(value = "/test", produces = "application/json")
 public class TestController
 {
     private final UpdateServiceByTicketingSystem updateServiceByTicketingSystem;

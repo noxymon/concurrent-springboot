@@ -38,7 +38,7 @@ public class UpdateServiceByTicketingSystem
         return usageDetailRepository.saveAndFlush(usageDetail);
     }
 
-    private UsageDetail saveFailToDetail(Long masterId,int sequence)
+    private UsageFailDetail saveFailToDetail(Long masterId,int sequence)
     {
         UsageFailDetail usageFailDetail = new UsageFailDetail();
         usageFailDetail.setMasterId(masterId);

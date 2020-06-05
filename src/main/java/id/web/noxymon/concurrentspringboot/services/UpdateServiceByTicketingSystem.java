@@ -2,9 +2,11 @@ package id.web.noxymon.concurrentspringboot.services;
 
 import id.web.noxymon.concurrentspringboot.repositories.UsageCounterNoOptimisticRepository;
 import id.web.noxymon.concurrentspringboot.repositories.UsageDetailRepository;
+import id.web.noxymon.concurrentspringboot.repositories.UsageFailDetailRepository;
 import id.web.noxymon.concurrentspringboot.repositories.entities.UsageCounter;
 import id.web.noxymon.concurrentspringboot.repositories.entities.UsageCounterNoVersion;
 import id.web.noxymon.concurrentspringboot.repositories.entities.UsageDetail;
+import id.web.noxymon.concurrentspringboot.repositories.entities.UsageFailDetail;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -18,21 +20,31 @@ import java.util.UUID;
 public class UpdateServiceByTicketingSystem
 {
     private final UsageDetailRepository usageDetailRepository;
+    private final UsageFailDetailRepository usageFailDetailRepository;
     private final UsageCounterNoOptimisticRepository usageCounterNoOptimisticRepository;
 
     @Transactional
     public synchronized void update(Long masterId, Integer maxCounter) throws RuntimeException
     {
         incrementUsageCounter(masterId, maxCounter);
-        saveToDetail(masterId);
     }
 
-    private UsageDetail saveToDetail(Long masterId)
+    private UsageDetail saveToDetail(Long masterId,int sequence)
     {
         UsageDetail usageDetail = new UsageDetail();
         usageDetail.setMasterId(masterId);
         usageDetail.setTranscationId(UUID.randomUUID().toString());
+        usageDetail.setSequenceNumber(sequence);
         return usageDetailRepository.saveAndFlush(usageDetail);
+    }
+
+    private UsageDetail saveFailToDetail(Long masterId,int sequence)
+    {
+        UsageFailDetail usageFailDetail = new UsageFailDetail();
+        usageFailDetail.setMasterId(masterId);
+        usageFailDetail.setTranscationId(UUID.randomUUID().toString());
+        usageFailDetail.setSequenceNumber(sequence);
+        return usageFailDetailRepository.saveAndFlush(usageFailDetail);
     }
 
     private void incrementUsageCounter(Long masterId, Integer maxCounter) throws RuntimeException
@@ -40,7 +52,10 @@ public class UpdateServiceByTicketingSystem
         UsageCounterNoVersion usageCounterNoVersion = usageCounterNoOptimisticRepository.updateUsage(masterId, 1);
         if (usageCounterNoVersion.getUsage() > maxCounter) {
             //rollback
+            saveFailToDetail(masterId,usageCounterNoVersion.getUsage());
             usageCounterNoOptimisticRepository.updateUsage(masterId, -1);
+        }else{
+            saveToDetail(masterId,usageCounterNoVersion.getUsage());
         }
     }
 

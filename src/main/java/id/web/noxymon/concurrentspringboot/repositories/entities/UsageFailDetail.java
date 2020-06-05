@@ -6,10 +6,10 @@ import javax.persistence.*;
 import lombok.Data;
 
 @Data
-@Entity(name = "id.web.noxymon.concurrentspringboot.repositories.entities.UsageDetail")
-@Table(name = "usage_detail")
-@IdClass(UsageDetail.PrimaryKeys.class)
-public class UsageDetail {
+@Entity(name = "id.web.noxymon.concurrentspringboot.repositories.entities.UsageFailDetail")
+@Table(name = "usage_fail_detail")
+@IdClass(UsageFailDetail.PrimaryKeys.class)
+public class UsageFailDetail {
   @Data
   public static class PrimaryKeys implements Serializable {
     private Long masterId;

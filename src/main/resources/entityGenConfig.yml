@@ -1,10 +1,10 @@
 jdbcSettings:
-  url: "jdbc:postgresql://172.20.0.2:5432/db_test"
-  username: "master"
-  password: "12345678"
+  url: "jdbc:postgresql://localhost:5432/rickylazuardy"
+  username: "rickylazuardy"
+  password: "rolazuardy234"
   driverClassName: "org.postgresql.Driver"
 
 packageName: "id.web.noxymon.concurrentspringboot.repositories.entities"
 tableScanMode: 'RuleBased'
 tableScanRules:
- - tableNames: ["usage_counter"]
+ - tableNames: ["usage_counter","usage_detail","usage_fail_detail"]

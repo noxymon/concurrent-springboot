@@ -11,7 +11,7 @@ public class UsageCounter {
 
   @Id
   @Column(name = "\"master_id\"", nullable = false)
-  private Integer masterId;
+  private Long masterId;
   @Column(name = "\"max_counter\"", nullable = true)
   private Integer maxCounter;
   @Column(name = "\"usage\"", nullable = true)

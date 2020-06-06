@@ -152,7 +152,7 @@ UPDATE public.usage_counter SET &quot;usage&quot;=0 WHERE master_id=1;</stringPr
             <stringProp name="HTTPSampler.port"></stringProp>
             <stringProp name="HTTPSampler.protocol"></stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">http://localhost:8080/test/ticketing/1</stringProp>
+            <stringProp name="HTTPSampler.path">http://localhost:8080/test/ticketing/1/10</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>

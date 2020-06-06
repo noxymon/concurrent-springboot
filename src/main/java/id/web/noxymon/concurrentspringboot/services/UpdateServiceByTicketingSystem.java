@@ -7,23 +7,22 @@ import id.web.noxymon.concurrentspringboot.repositories.entities.UsageDetail;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.UUID;
 
 @Slf4j
-@Repository
+@Service
 @RequiredArgsConstructor
 public class UpdateServiceByTicketingSystem
 {
     private final UsageDetailRepository usageDetailRepository;
     private final UsageCounterNoOptimisticRepository usageCounterNoOptimisticRepository;
 
-    @Transactional
-    public synchronized void update(Long masterId, Integer maxCounter) throws RuntimeException
+    public void update(Long masterId, Integer maxCounter) throws RuntimeException
     {
         incrementUsageCounter(masterId, maxCounter);
-        saveToDetail(masterId);
     }
 
     private UsageDetail saveToDetail(Long masterId)
@@ -36,9 +35,12 @@ public class UpdateServiceByTicketingSystem
 
     private void incrementUsageCounter(Long masterId, Integer maxCounter) throws RuntimeException
     {
-        final int usageAfterIncement = usageCounterNoOptimisticRepository.incrementUsage(masterId, maxCounter);
-        if (usageAfterIncement > maxCounter) {
+        final UsageCounterNoVersion usageAfterIncrement = usageCounterNoOptimisticRepository.updateUsage(masterId);
+        if (usageAfterIncrement.getUsage() > maxCounter) {
+            usageCounterNoOptimisticRepository.decreaseUsage(masterId);
             throw new RuntimeException("Failed !!");
+        }else{
+            saveToDetail(masterId);
         }
     }
 }
